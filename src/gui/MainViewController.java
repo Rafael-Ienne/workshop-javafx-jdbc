@@ -15,6 +15,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import model.services.DepartmentService;
 
 /*A interface Initializable permite colocar código para ser executado antes da inicialização do controlador*/
 public class MainViewController implements Initializable{
@@ -40,7 +41,7 @@ public class MainViewController implements Initializable{
 	/*Método que trata a ação ao se clicar no menu item Department*/
 	@FXML
 	public void onMenuItemDepartmentAction() {
-		loadView("/gui/DepartmentList.fxml");
+		loadView2("/gui/DepartmentList.fxml");
 	}
 	
 	/*Método que trata a ação ao se clicar no menu item About*/
@@ -80,5 +81,37 @@ public class MainViewController implements Initializable{
 		}
 	}
 	
+	/*Método que carrega outra view dentro da view principal. O synchronized garante que o processamento dentro do try
+	 não seja interrompido durante o multi thread*/
+	private synchronized void loadView2(String absoluteName) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			VBox newVBox = loader.load();
+			
+			/*Criando uma referência à view principal*/
+			Scene mainScene = Main.getMainScene();
+			/*O mainVBox pega o VBox da view main*/
+			VBox mainVbox = (VBox)((ScrollPane)mainScene.getRoot()).getContent();
+			
+			/*Variável que preserva o menu principal*/
+			Node mainMenu = mainVbox.getChildren().get(0);
+			/*Limpeza do menu principal (children) da view main*/
+			mainVbox.getChildren().clear();
+			/*Adição do mainMenu*/
+			mainVbox.getChildren().add(mainMenu);
+			/*Adição dos filhos do newVBox ao main menu*/
+			mainVbox.getChildren().addAll(newVBox.getChildren());
+			
+			/*Por meio dessa instanciação, pode-se acessar view e controller dessa view*/
+			DepartmentListController controller = loader.getController();
+			/*Injeção de dependência no controller*/
+			controller.setDepartmentService(new DepartmentService());
+			/*Atualização dos dados da TableView*/
+			controller.updateTableView();
+			
+		} catch (IOException e) {
+			Alerts.showAlert("IOException", "Error loading view", e.getMessage(), AlertType.ERROR);;
+		}
+	}
 
 }
