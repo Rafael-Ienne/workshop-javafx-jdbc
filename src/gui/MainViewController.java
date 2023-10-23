@@ -16,6 +16,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
+/*A interface Initializable permite colocar código para ser executado antes da inicialização do controlador*/
 public class MainViewController implements Initializable{
 	
 	/*Associação com o menu item Seller*/
@@ -39,7 +40,7 @@ public class MainViewController implements Initializable{
 	/*Método que trata a ação ao se clicar no menu item Department*/
 	@FXML
 	public void onMenuItemDepartmentAction() {
-		System.out.println("onMenuItemDepartmentAction");
+		loadView("/gui/DepartmentList.fxml");
 	}
 	
 	/*Método que trata a ação ao se clicar no menu item About*/
