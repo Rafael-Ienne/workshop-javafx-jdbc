@@ -3,6 +3,7 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import application.Main;
 import gui.util.Alerts;
@@ -38,16 +39,20 @@ public class MainViewController implements Initializable{
 		System.out.println("onMenuItemSellerAction");
 	}
 	
-	/*Método que trata a ação ao se clicar no menu item Department*/
+	/*Método que trata a ação ao se clicar no menu item Department. Deve-se passar o caminho da View e uma função para
+	 inicializar o controlador*/
 	@FXML
 	public void onMenuItemDepartmentAction() {
-		loadView2("/gui/DepartmentList.fxml");
+		loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
+			controller.setDepartmentService(new DepartmentService());
+			controller.updateTableView();
+		});
 	}
 	
 	/*Método que trata a ação ao se clicar no menu item About*/
 	@FXML
 	public void onMenuItemAboutAction() {
-		loadView("/gui/About.fxml");
+		loadView("/gui/About.fxml", x -> {});
 	}
 
 	@Override
@@ -57,7 +62,7 @@ public class MainViewController implements Initializable{
 	
 	/*Método que carrega a view about dentro do view principal. O synchronized garante que o processamento dentro do try
 	 não seja interrompido durante o multi thread*/
-	private synchronized void loadView(String absoluteName) {
+	private synchronized <T> void loadView(String absoluteName, Consumer <T> initializingAction) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			VBox newVBox = loader.load();
@@ -75,43 +80,17 @@ public class MainViewController implements Initializable{
 			mainVbox.getChildren().add(mainMenu);
 			/*Adição dos filhos do newVBox ao main menu*/
 			mainVbox.getChildren().addAll(newVBox.getChildren());
+			
+			/*O loader.getController() retorna o controller do tipo que foi informado no parâmetro e
+			 o initializingAction.accept(controller) executa a função dada como parâmetro*/
+			T controller = loader.getController();
+			initializingAction.accept(controller);
 			
 		} catch (IOException e) {
 			Alerts.showAlert("IOException", "Error loading view", e.getMessage(), AlertType.ERROR);;
 		}
 	}
 	
-	/*Método que carrega outra view dentro da view principal. O synchronized garante que o processamento dentro do try
-	 não seja interrompido durante o multi thread*/
-	private synchronized void loadView2(String absoluteName) {
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
-			VBox newVBox = loader.load();
-			
-			/*Criando uma referência à view principal*/
-			Scene mainScene = Main.getMainScene();
-			/*O mainVBox pega o VBox da view main*/
-			VBox mainVbox = (VBox)((ScrollPane)mainScene.getRoot()).getContent();
-			
-			/*Variável que preserva o menu principal*/
-			Node mainMenu = mainVbox.getChildren().get(0);
-			/*Limpeza do menu principal (children) da view main*/
-			mainVbox.getChildren().clear();
-			/*Adição do mainMenu*/
-			mainVbox.getChildren().add(mainMenu);
-			/*Adição dos filhos do newVBox ao main menu*/
-			mainVbox.getChildren().addAll(newVBox.getChildren());
-			
-			/*Por meio dessa instanciação, pode-se acessar view e controller dessa view*/
-			DepartmentListController controller = loader.getController();
-			/*Injeção de dependência no controller*/
-			controller.setDepartmentService(new DepartmentService());
-			/*Atualização dos dados da TableView*/
-			controller.updateTableView();
-			
-		} catch (IOException e) {
-			Alerts.showAlert("IOException", "Error loading view", e.getMessage(), AlertType.ERROR);;
-		}
-	}
+	
 
 }
