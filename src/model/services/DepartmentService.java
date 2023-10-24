@@ -15,5 +15,14 @@ public class DepartmentService {
 		
 		return dao.findAll();
 	}
+	
+	/*Me´todo que atualiza ou insere um novo departamento com base no id*/
+	public void saveOrUpdate(Department dep) {
+		if(dep.getId() == null){
+			dao.insert(dep);
+		} else {
+			dao.update(dep);
+		}
+	}
 
 }

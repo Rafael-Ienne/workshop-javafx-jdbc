@@ -102,6 +102,7 @@ public class DepartmentListController implements Initializable{
 			
 			DepartmentFormController controller = loader.getController();
 			controller.setDepartment(dep);
+			controller.setService(new DepartmentService());
 			controller.updateFormData();
 			
 			/*Instancia-se outro stage para ter um palco na frente do outro*/

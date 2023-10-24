@@ -11,5 +11,14 @@ public class Util {
 	public static Stage currentStage(ActionEvent event) {
 		return (Stage)((Node)event.getSource()).getScene().getWindow();
 	}
+	
+	/*Método que passa o valor passado no formulário para inteiro*/
+	public static Integer tryParsetoInt(String str) {
+		try {
+			return Integer.parseInt(str);
+		} catch(NumberFormatException e) {
+			return null;
+		}
+	}
 
 }
