@@ -24,5 +24,10 @@ public class DepartmentService {
 			dao.update(dep);
 		}
 	}
+	
+	/*Me´todo para remover valor de uma lista*/
+	public void remove(Department dep) {
+		dao.deleteById(dep.getId());
+	}
 
 }

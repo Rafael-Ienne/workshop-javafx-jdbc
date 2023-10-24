@@ -3,9 +3,11 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import application.Main;
+import db.DbIntegrityException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Util;
@@ -19,6 +21,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -30,6 +33,10 @@ import model.entities.Department;
 import model.services.DepartmentService;
 
 public class DepartmentListController implements Initializable, DataChangeListener {
+
+	/* Coluna que adiciona um botão para remover um departamento */
+	@FXML
+	private TableColumn<Department, Department> tableColumnREMOVE;
 
 	/* Coluna que adiciona um botão para editar um departamento */
 	@FXML
@@ -105,6 +112,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 		obsList = FXCollections.observableArrayList(list);
 		tableViewDepartments.setItems(obsList);
 		initEditButtons();
+		initRemoveButtons();
 
 	}
 
@@ -152,7 +160,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	}
 
 	/*
-	 * Método que cria os botões do lado de cada linha e abre a janela de diálogo já
+	 * Método que cria os botões de editar do lado de cada linha e abre a janela de diálogo já
 	 * com os dados do departamento preenchidos
 	 */
 	private void initEditButtons() {
@@ -172,6 +180,45 @@ public class DepartmentListController implements Initializable, DataChangeListen
 						event -> createDialogForm(obj, "/gui/DepartmentForm.fxml", Util.currentStage(event)));
 			}
 		});
+	}
+
+	/*
+	 * Método que cria os botões de remover do lado de cada linha e abre a janela de diálogo já
+	 * com os dados do departamento preenchidos
+	 */
+	private void initRemoveButtons() {
+		tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+		tableColumnREMOVE.setCellFactory(param -> new TableCell<Department, Department>() {
+			private final Button button = new Button("remove");
+
+			@Override
+			protected void updateItem(Department obj, boolean empty) {
+				super.updateItem(obj, empty);
+				if (obj == null) {
+					setGraphic(null);
+					return;
+				}
+				setGraphic(button);
+				button.setOnAction(event -> removeEntity(obj));
+			}
+		});
+	}
+
+	private void removeEntity(Department obj) {
+		Optional<ButtonType> option = Alerts.showConfirmation("Confirmation", "Are you sure about your decision?");
+		
+		if(option.get() == ButtonType.OK) {
+			if(service == null) {
+				throw new IllegalStateException("Service was null");
+			}
+			try {
+				service.remove(obj);
+				updateTableView();
+			} catch(DbIntegrityException e1) {
+				Alerts.showAlert("Error removing object", null, e1.getMessage(), AlertType.ERROR);
+			}
+		}
+		
 	}
 
 }
