@@ -1,5 +1,6 @@
 package gui;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +17,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -24,6 +27,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Seller;
 import model.services.SellerService;
@@ -84,7 +89,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 	public void onBtNewAction(ActionEvent event) {
 		Stage parentStage = Util.currentStage(event);
 		Seller dep = new Seller();
-//		createDialogForm(dep, "/gui/SellerForm.fxml", parentStage);
+		createDialogForm(dep, "/gui/SellerForm.fxml", parentStage);
 	}
 
 	@Override
@@ -139,33 +144,33 @@ public class SellerListController implements Initializable, DataChangeListener {
 	 * Esse método recebe como parâmetros um objeto Seller vazio, o caminho
 	 * .fxml da view e o Stage que criou a janela de diálogo
 	 */
-//	private void createDialogForm(Seller dep, String absoluteName, Stage parentStage) {
-//		try {
+	private void createDialogForm(Seller dep, String absoluteName, Stage parentStage) {
+		try {
 
-//			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
-//			Pane pane = loader.load();
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			Pane pane = loader.load();
 
-//			SellerFormController controller = loader.getController();
-//			controller.setSeller(dep);
-//			controller.setService(new SellerService());
-//			controller.subscribeDataChangeListener(this);
-//			controller.updateFormData();
+			SellerFormController controller = loader.getController();
+			controller.setSeller(dep);
+			controller.setService(new SellerService());
+			controller.subscribeDataChangeListener(this);
+			controller.updateFormData();
 
 			/* Instancia-se outro stage para ter um palco na frente do outro */
-//			Stage dialogStage = new Stage();
+			Stage dialogStage = new Stage();
 
 			/* Configurações da janela de diálogo */
-//			dialogStage.setTitle("Enter department data");
-//			dialogStage.setScene(new Scene(pane));
-//			dialogStage.setResizable(false);
-//			dialogStage.initOwner(parentStage);
-//			dialogStage.initModality(Modality.WINDOW_MODAL);
-//			dialogStage.showAndWait();
+			dialogStage.setTitle("Enter seller data");
+			dialogStage.setScene(new Scene(pane));
+			dialogStage.setResizable(false);
+			dialogStage.initOwner(parentStage);
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.showAndWait();
 
-//		} catch (IOException e) {
-//			Alerts.showAlert("IOException", "Error loading view", e.getMessage(), AlertType.ERROR);
-//		}
-//	}
+		} catch (IOException e) {
+			Alerts.showAlert("IOException", "Error loading view", e.getMessage(), AlertType.ERROR);
+		}
+	}
 
 	/* Método que atualiza a table view ao ocorrer o salvamento de um novo objeto */
 	@Override
@@ -191,8 +196,8 @@ public class SellerListController implements Initializable, DataChangeListener {
 					return;
 				}
 				setGraphic(button);
-//				button.setOnAction(
-//						event -> createDialogForm(obj, "/gui/SellerForm.fxml", Util.currentStage(event)));
+				button.setOnAction(
+						event -> createDialogForm(obj, "/gui/SellerForm.fxml", Util.currentStage(event)));
 			}
 		});
 	}
