@@ -10,7 +10,7 @@ public class DepartmentService {
 	
 	private DepartmentDao dao = DaoFactory.createDepartmentDao(); 
 	
-	/*Método que retorna lista de departamentos mocado*/
+	/*Método que retorna lista de departamentos*/
 	public List<Department> findAll(){
 		
 		return dao.findAll();

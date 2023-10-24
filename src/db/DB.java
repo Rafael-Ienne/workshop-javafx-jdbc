@@ -1,3 +1,4 @@
+/*Classe que possui métodos para acessar banco de dados e outras funções auxiliares*/
 package db;
 
 import java.io.FileInputStream;

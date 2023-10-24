@@ -1,3 +1,4 @@
+/*Camada de acesso a dados do Department*/
 package model.dao.impl;
 
 import java.sql.Connection;
