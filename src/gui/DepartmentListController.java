@@ -57,7 +57,8 @@ public class DepartmentListController implements Initializable{
 	@FXML
 	public void onBtNewAction(ActionEvent event) {
 		Stage parentStage = Util.currentStage(event);
-		createDialogForm("/gui/DepartmentForm.fxml", parentStage);
+		Department dep = new Department();
+		createDialogForm(dep, "/gui/DepartmentForm.fxml", parentStage);
 	}
 
 	@Override
@@ -93,11 +94,15 @@ public class DepartmentListController implements Initializable{
 	
 	/*Método que cria a janela modal de diálogo que será gerada ao se clicar no botão new da página de Department*/
 	/*Esse método recebe como parâmetro o caminho .fxml da view e o Stage que criou a janela de diálogo */
-	private void createDialogForm(String absoluteName, Stage parentStage) {
+	private void createDialogForm(Department dep, String absoluteName, Stage parentStage) {
 		try {
 			
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
+			
+			DepartmentFormController controller = loader.getController();
+			controller.setDepartment(dep);
+			controller.updateFormData();
 			
 			/*Instancia-se outro stage para ter um palco na frente do outro*/
 			Stage dialogStage = new Stage();
