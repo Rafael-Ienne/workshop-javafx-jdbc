@@ -94,7 +94,8 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	}
 	
 	/*Método que cria a janela modal de diálogo que será gerada ao se clicar no botão new da página de Department*/
-	/*Esse método recebe como parâmetro o caminho .fxml da view e o Stage que criou a janela de diálogo */
+	/*Esse método recebe como parâmetros um objeto Department vazio, o caminho .fxml da view e o Stage que criou
+	 a janela de diálogo */
 	private void createDialogForm(Department dep, String absoluteName, Stage parentStage) {
 		try {
 			

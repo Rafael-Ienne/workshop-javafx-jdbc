@@ -3,7 +3,9 @@ package gui;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import db.DbException;
 import gui.listeners.DataChangeListener;
@@ -18,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Department;
+import model.exceptions.ValidationException;
 import model.services.DepartmentService;
 
 public class DepartmentFormController implements Initializable {
@@ -71,7 +74,10 @@ public class DepartmentFormController implements Initializable {
 			service.saveOrUpdate(department);
 			notifyDataChangeListeners();
 			Util.currentStage(event).close();
-		} catch(DbException e) {
+		} catch(ValidationException e1) {
+			setErrorMessages(e1.getErrors());
+		
+		}catch(DbException e) {
 			Alerts.showAlert("Error saving object", null, e.getMessage(), AlertType.ERROR);
 		}
 	}
@@ -85,9 +91,21 @@ public class DepartmentFormController implements Initializable {
 
 	/*Método que instancia um objeto Department com base no que foi pego nas caixas de texto*/
 	private Department getFormData() {
+		
+		ValidationException ve = new ValidationException("Validation error");
+		
 		Department obj = new Department();
 		obj.setId(Util.tryParsetoInt(txtId.getText()));
+		
+		if(txtName.getText() == null || txtName.getText().trim().equals("")) {
+			ve.addError("name", "Field cannot be empty");
+		}
 		obj.setName(txtName.getText());
+		
+		if(ve.getErrors().size() > 0) {
+			throw ve;
+		}
+		
 		return obj;
 	}
 
@@ -115,6 +133,16 @@ public class DepartmentFormController implements Initializable {
 		}
 		txtId.setText(String.valueOf(department.getId()));
 		txtName.setText(String.valueOf(department.getName()));
+	}
+	
+	/*Método para escrever o erro(quando houver) no label do lado de name*/
+	
+	private void setErrorMessages(Map<String, String> errors) {
+		Set<String> fields = errors.keySet();
+		
+		if(fields.contains("name")) {
+			labelErrorName.setText(errors.get("name"));
+		}
 	}
 
 }
