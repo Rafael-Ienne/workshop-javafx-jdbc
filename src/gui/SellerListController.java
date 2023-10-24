@@ -1,6 +1,7 @@
 package gui;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -29,11 +30,24 @@ import model.services.SellerService;
 
 public class SellerListController implements Initializable, DataChangeListener {
 
-	/* Coluna que adiciona um botão para remover um departamento */
+	
+	/* Coluna que corresponde ao email de um seller */
+	@FXML
+	private TableColumn<Seller, String> tableColumnEmail;
+	
+	/* Coluna que corresponde ao birthdate de um seller */
+	@FXML
+	private TableColumn<Seller, Date> tableColumnbirthDate;
+	
+	/* Coluna que corresponde ao salario base de um seller */
+	@FXML
+	private TableColumn<Seller, Double> tableColumnbaseSalary;
+	
+	/* Coluna que adiciona um botão para remover um seller */
 	@FXML
 	private TableColumn<Seller, Seller> tableColumnREMOVE;
 
-	/* Coluna que adiciona um botão para editar um departamento */
+	/* Coluna que adiciona um botão para editar um seller */
 	@FXML
 	private TableColumn<Seller, Seller> tableColumnEDIT;
 
@@ -86,6 +100,12 @@ public class SellerListController implements Initializable, DataChangeListener {
 	private void initializeNodes() {
 		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
+		tableColumnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+		tableColumnbirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+		Util.formatTableColumnDate(tableColumnbirthDate, "dd/MM/yyyy");
+		tableColumnbaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
+		Util.formatTableColumnDouble(tableColumnbaseSalary, 2);
+		
 
 		/* Esquema para que o TableView acompanhe a altura da janela */
 		Stage stage = (Stage) Main.getMainScene().getWindow();
@@ -94,7 +114,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 	}
 
 	/*
-	 * Método que acessa o serviço, carrega departamento, coloca na ObservableList e
+	 * Método que acessa o serviço, carrega seller, coloca na ObservableList e
 	 * a adiciona na TableView
 	 */
 	public void updateTableView() {
@@ -156,7 +176,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 	/*
 	 * Método que cria os botões de editar do lado de cada linha e abre a janela de
-	 * diálogo já com os dados do departamento preenchidos
+	 * diálogo já com os dados do seller preenchidos
 	 */
 	private void initEditButtons() {
 		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
@@ -179,7 +199,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 	/*
 	 * Método que cria os botões de remover do lado de cada linha e abre a janela de
-	 * diálogo já com os dados do departamento preenchidos
+	 * diálogo já com os dados do seller preenchidos
 	 */
 	private void initRemoveButtons() {
 		tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));

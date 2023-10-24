@@ -1,24 +1,71 @@
 package gui.util;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.stage.Stage;
 
 public class Util {
-	
-	/*Método que retorna o stage atual onde o controller que recebeu o evento está. O parâmetro
-	  é o evento que o botão recebeu*/
+
+	/*
+	 * Método que retorna o stage atual onde o controller que recebeu o evento está.
+	 * O parâmetro é o evento que o botão recebeu
+	 */
 	public static Stage currentStage(ActionEvent event) {
-		return (Stage)((Node)event.getSource()).getScene().getWindow();
+		return (Stage) ((Node) event.getSource()).getScene().getWindow();
 	}
-	
-	/*Método que passa o valor passado no formulário para inteiro*/
+
+	/* Método que passa o valor passado no formulário para inteiro */
 	public static Integer tryParsetoInt(String str) {
 		try {
 			return Integer.parseInt(str);
-		} catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return null;
 		}
+	}
+
+	/* Método que formata o Table Column Date */
+	public static <T> void formatTableColumnDate(TableColumn<T, Date> tableColumn, String format) {
+		tableColumn.setCellFactory(column -> {
+			TableCell<T, Date> cell = new TableCell<T, Date>() {
+				private SimpleDateFormat sdf = new SimpleDateFormat(format);
+
+				@Override
+				protected void updateItem(Date item, boolean empty) {
+					super.updateItem(item, empty);
+					if (empty) {
+						setText(null);
+					} else {
+						setText(sdf.format(item));
+					}
+				}
+			};
+			return cell;
+		});
+	}
+
+	/*Método que formata o Table Column Double*/
+	public static <T> void formatTableColumnDouble(TableColumn<T, Double> tableColumn, int decimalPlaces) {
+		tableColumn.setCellFactory(column -> {
+			TableCell<T, Double> cell = new TableCell<T, Double>() {
+				@Override
+				protected void updateItem(Double item, boolean empty) {
+					super.updateItem(item, empty);
+					if (empty) {
+						setText(null);
+					} else {
+						Locale.setDefault(Locale.US);
+						setText(String.format("%." + decimalPlaces + "f", item));
+					}
+				}
+			};
+			return cell;
+		});
 	}
 
 }
