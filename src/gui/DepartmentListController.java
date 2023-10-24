@@ -91,15 +91,18 @@ public class DepartmentListController implements Initializable{
 		
 	}
 	
-	/*Método que cria a janela modal que será gerada ao se clicar no botão new da página de Department*/
+	/*Método que cria a janela modal de diálogo que será gerada ao se clicar no botão new da página de Department*/
+	/*Esse método recebe como parâmetro o caminho .fxml da view e o Stage que criou a janela de diálogo */
 	private void createDialogForm(String absoluteName, Stage parentStage) {
 		try {
 			
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
 			
+			/*Instancia-se outro stage para ter um palco na frente do outro*/
 			Stage dialogStage = new Stage();
 			
+			/*Configurações da janela de diálogo*/
 			dialogStage.setTitle("Enter department data");
 			dialogStage.setScene(new Scene(pane));
 			dialogStage.setResizable(false);
