@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import application.Main;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Util;
 import javafx.collections.FXCollections;
@@ -26,7 +27,7 @@ import javafx.stage.Stage;
 import model.entities.Department;
 import model.services.DepartmentService;
 
-public class DepartmentListController implements Initializable{
+public class DepartmentListController implements Initializable, DataChangeListener{
 	
 	/*Dependência de serviço para que os dados sejam mostrados na view de DepartmentList*/
 	private DepartmentService service;
@@ -103,6 +104,7 @@ public class DepartmentListController implements Initializable{
 			DepartmentFormController controller = loader.getController();
 			controller.setDepartment(dep);
 			controller.setService(new DepartmentService());
+			controller.subscribeDataChangeListener(this);
 			controller.updateFormData();
 			
 			/*Instancia-se outro stage para ter um palco na frente do outro*/
@@ -119,6 +121,13 @@ public class DepartmentListController implements Initializable{
 		} catch(IOException e) {
 			Alerts.showAlert("IOException", "Error loading view", e.getMessage(), AlertType.ERROR);
 		}
+	}
+
+	/*Método que atualiza a table view ao ocorrer o salvamento de um novo objeto*/
+	@Override
+	public void onDataChanged() {
+		updateTableView();
+		
 	}
 	
 
