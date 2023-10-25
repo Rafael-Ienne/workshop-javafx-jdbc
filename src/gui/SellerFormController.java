@@ -15,28 +15,47 @@ import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Util;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.util.Callback;
+import model.entities.Department;
 import model.entities.Seller;
 import model.exceptions.ValidationException;
+import model.services.DepartmentService;
 import model.services.SellerService;
 
 public class SellerFormController implements Initializable {
 
+	private DepartmentService departmentService;
+
 	private Seller seller;
+
+	/*
+	 * Atributo que corresponde às opções de departamento que podem ser escolhidos
+	 */
+	@FXML
+	private ComboBox<Department> comboBoxDepartment;
+
+	private ObservableList<Department> obsList;
 
 	private SellerService service;
 
 	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 
-	public void setService(SellerService service) {
+	public void setServices(SellerService service, DepartmentService service2) {
 		this.service = service;
+		this.departmentService = service2;
 	}
 
 	public void setSeller(Seller seller) {
@@ -51,53 +70,53 @@ public class SellerFormController implements Initializable {
 		dataChangeListeners.add(listener);
 	}
 
-	/*Atributo que corresponde ao id do seller*/
+	/* Atributo que corresponde ao id do seller */
 	@FXML
 	private TextField txtId;
 
-	/*Atributo que corresponde ao nome do seller*/
+	/* Atributo que corresponde ao nome do seller */
 	@FXML
 	private TextField txtName;
 
-	/*Atributo que corresponde à caixa de erro ao lado do nome*/
+	/* Atributo que corresponde à caixa de erro ao lado do nome */
 	@FXML
 	private Label labelErrorName;
-	
-	/*Atributo que corresponde ao email do seller*/
+
+	/* Atributo que corresponde ao email do seller */
 	@FXML
 	private TextField txtEmail;
-	
-	/*Atributo que corresponde à caixa de erro ao lado do email*/
+
+	/* Atributo que corresponde à caixa de erro ao lado do email */
 	@FXML
 	private Label labelErrorEmail;
-	
-	/*Atributo que corresponde à data de nascimento do seller*/
+
+	/* Atributo que corresponde à data de nascimento do seller */
 	@FXML
 	private DatePicker dpBirthDate;
-	
-	/*Atributo que corresponde à caixa de erro ao lado da data de nascimento*/
+
+	/* Atributo que corresponde à caixa de erro ao lado da data de nascimento */
 	@FXML
 	private Label labelErrorBirthDate;
-	
-	/*Atributo que corresponde ao salario base do seller*/
+
+	/* Atributo que corresponde ao salario base do seller */
 	@FXML
 	private TextField txtBaseSalary;
-	
-	/*Atributo que corresponde à caixa de erro ao lado do salário base*/
+
+	/* Atributo que corresponde à caixa de erro ao lado do salário base */
 	@FXML
 	private Label labelErrorBaseSalary;
 
-	/*Atributo que corresponde ao botão de salvar o seller*/
+	/* Atributo que corresponde ao botão de salvar o seller */
 	@FXML
 	private Button btSave;
 
-	/*Atributo que corresponde ao processo de fechar o formulário*/
+	/* Atributo que corresponde ao processo de fechar o formulário */
 	@FXML
 	private Button btCancel;
 
 	/*
-	 * Método que salva ou atualiza o banco de dados com base nos dados passados
-	 * nos text fields e fecha a janela de diálogo
+	 * Método que salva ou atualiza o banco de dados com base nos dados passados nos
+	 * text fields e fecha a janela de diálogo
 	 */
 	@FXML
 	public void onBtSaveAction(ActionEvent event) {
@@ -129,8 +148,8 @@ public class SellerFormController implements Initializable {
 	}
 
 	/*
-	 * Método que instancia um objeto Seller com base no que foi pego nas caixas
-	 * de texto
+	 * Método que instancia um objeto Seller com base no que foi pego nas caixas de
+	 * texto
 	 */
 	private Seller getFormData() {
 
@@ -168,9 +187,12 @@ public class SellerFormController implements Initializable {
 		Constraints.setTextFieldMaxLength(txtName, 60);
 		Constraints.setTextFieldMaxLength(txtEmail, 60);
 		Util.formatDatePicker(dpBirthDate, "dd/MM/yyyy");
+		initializeComboBoxDepartment();
 	}
 
-	/* Método que pega os dados do Seller e popular as caixas de texto doformulário*/
+	/*
+	 * Método que pega os dados do Seller e popula as caixas de texto do formulário
+	 */
 	public void updateFormData() {
 		if (seller == null) {
 			throw new IllegalStateException("Seller was null");
@@ -180,8 +202,13 @@ public class SellerFormController implements Initializable {
 		txtEmail.setText(String.valueOf(seller.getEmail()));
 		Locale.setDefault(Locale.US);
 		txtBaseSalary.setText(String.format("%.2f", seller.getBaseSalary()));
-		if(seller.getBirthDate() != null) {
+		if (seller.getBirthDate() != null) {
 			dpBirthDate.setValue(LocalDate.ofInstant(seller.getBirthDate().toInstant(), ZoneId.systemDefault()));
+		}
+		if(seller.getDepartment() == null) {
+			comboBoxDepartment.getSelectionModel().selectFirst();
+		} else {
+			comboBoxDepartment.setValue(seller.getDepartment());
 		}
 	}
 
@@ -193,6 +220,30 @@ public class SellerFormController implements Initializable {
 		if (fields.contains("name")) {
 			labelErrorName.setText(errors.get("name"));
 		}
+	}
+
+	/*
+	 * Método que chama o departament service e carrega os departamentos do banco de
+	 * dados, preenchendo a obsList
+	 */
+	public void loadAssociatedObjects() {
+		if (departmentService == null) {
+			throw new IllegalStateException("Department servoce was null");
+		}
+		obsList = FXCollections.observableList(departmentService.findAll());
+		comboBoxDepartment.setItems(obsList);
+	}
+
+	private void initializeComboBoxDepartment() {
+		Callback<ListView<Department>, ListCell<Department>> factory = lv -> new ListCell<Department>() {
+			@Override
+			protected void updateItem(Department item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty ? "" : item.getName());
+			}
+		};
+		comboBoxDepartment.setCellFactory(factory);
+		comboBoxDepartment.setButtonCell(factory.call(null));
 	}
 
 }
