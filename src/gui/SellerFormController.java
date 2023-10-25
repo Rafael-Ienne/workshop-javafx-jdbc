@@ -1,9 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -160,8 +162,30 @@ public class SellerFormController implements Initializable {
 
 		if (txtName.getText() == null || txtName.getText().trim().equals("")) {
 			ve.addError("name", "Field cannot be empty");
+		} else {
+			obj.setName(txtName.getText());
 		}
-		obj.setName(txtName.getText());
+		
+		if (txtEmail.getText() == null || txtEmail.getText().trim().equals("")) {
+			ve.addError("email", "Field cannot be empty");
+		} else {
+			obj.setEmail(txtEmail.getText());
+		}
+		
+		if(dpBirthDate.getValue() == null) {
+			ve.addError("birthDate", "Field cannot be empty");
+		} else {
+			Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+			obj.setBirthDate(Date.from(instant));
+		}
+		
+		if (txtBaseSalary.getText() == null || txtBaseSalary.getText().trim().equals("")) {
+			ve.addError("baseSalary", "Field cannot be empty");
+		} else {
+			obj.setBaseSalary(Util.tryParsetoDouble(txtBaseSalary.getText()));
+		}
+		
+		obj.setDepartment(comboBoxDepartment.getValue());
 
 		if (ve.getErrors().size() > 0) {
 			throw ve;
@@ -219,6 +243,18 @@ public class SellerFormController implements Initializable {
 
 		if (fields.contains("name")) {
 			labelErrorName.setText(errors.get("name"));
+		}
+		
+		if (fields.contains("email")) {
+			labelErrorEmail.setText(errors.get("email"));
+		}
+		
+		if (fields.contains("baseSalary")) {
+			labelErrorBaseSalary.setText(errors.get("baseSalary"));
+		}
+		
+		if (fields.contains("birthDate")) {
+			labelErrorBirthDate.setText(errors.get("birthDate"));
 		}
 	}
 

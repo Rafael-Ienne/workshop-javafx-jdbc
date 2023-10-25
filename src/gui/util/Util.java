@@ -32,6 +32,15 @@ public class Util {
 			return null;
 		}
 	}
+	
+	/* Método que passa o valor passado no formulário para double */
+	public static Double tryParsetoDouble(String str) {
+		try {
+			return Double.parseDouble(str);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
 
 	/* Método que formata o Table Column Date */
 	public static <T> void formatTableColumnDate(TableColumn<T, Date> tableColumn, String format) {
